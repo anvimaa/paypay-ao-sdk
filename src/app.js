@@ -7,9 +7,22 @@ const cors = require("cors"); // Added to handle CORS for React frontend
 
 // Configuration
 const config = {
-  partnerId: "",
+  partnerId: "200002914662",
   privateKey: `-----BEGIN PRIVATE KEY-----
-
+MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAOb9ztBh/awG26pT
+G4Jw/tGoej321bYEvIR07cXU0SSYwhSN3Dp2dD9oQDO3QaThcu423mMIuBgzPVl9
+Mex4oDty4cE5EEtwMEBy6N9h2eNxz1PF3nrBqcLsDtpc7zywuATuiDr9T7WOe/gx
+6wYFnp1scTr2E3e3J/oWgdlKeH0NAgMBAAECgYEAvSsoPuGxJDutk6xiAA5XsQ2f
+prVJybnRRUyZGQWzjZwIfVq7+6jchLz0ryWp/cSgIdQPhd0zHqZ/3JS52OXkmZyr
+u8YJaSTeYBIFfco4dguD/dpWJh0c9X2yygb7eQEcG2JpgjvI0FHBvojdGE5B1Wz0
+pis5sUqfOdW35/nUNIECQQD0F206tcW06VNNL/3YdjO8VvDN5hOd/vThrNFV1aBK
+w2njSh8Dr9ixq6lRFSljVTAa/b22Ak9YJaXi4O2YPHHtAkEA8kLEqrqDhs1Pn243
+JrXm8+vMulW+6XYCgo/AFspRXJssnaNK8lrlTDAxrLU/+kjCwX+ITDdj1Hj3S7Zq
+NPlToQJAZheCTSMH/UH14HvpLWdK/kRS1ZucquGfZOCWcdM3Bu4y1KkEzdL3zGAj
+IlG6jNxtkWx9s6nFq/WbK4iud5UYhQJAJhyG3+zzoBNQgV5PYtGfAaSI0o+GtyeP
+gYany24Mmqr2u93ifnn6NKAoUGk7JV6o9NPhV0wncleNX+XUk3zdwQJBAKj3nGgw
+zUPUBCkxLAK2tr+vf0ifQ/udJQml9p2pPO8b+4aB6IXc2tGxQrmBXFVOvRFVzTbs
+DVnp5lAOol92g8k=
 -----END PRIVATE KEY-----`,
   paypayPublicKey: `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArL1akdPqJVYIGI4vGNiN
@@ -20,8 +33,9 @@ dvoxn7TWYOorLrNOBz3BP2yVSf31L6yPbQIs8hn59iOzbWy8raXAYWjYgM9Lh6h2
 5TQG6V8fnYO+Qd4R13jO+32V+EgizHQirhVayAFQGbTBSPIg85G8gVNU64SxbZ5J
 XQIDAQAB
 -----END PUBLIC KEY-----`,
-  apiUrl: "", // Verify with PAYPAY support
-  saleProductCode: "",
+  apiUrl: "https://gateway.paypayafrica.com/recv.do", // Verify with PAYPAY support
+  saleProductCode: "050200001",
+  language: "pt",
 };
 
 /**
@@ -99,7 +113,7 @@ function encryptBizContentWithPrivateKey(bizContent, privateKey) {
 
   const encryptedBuffer = Buffer.concat(encryptedChunks);
   const encoded = encryptedBuffer.toString("base64");
-  console.log(`Encrypted biz_content (base64): ${encoded}`);
+  //console.log(`Encrypted biz_content (base64): ${encoded}`);
   return encoded;
 }
 
@@ -121,14 +135,14 @@ function generateSignature(params, privateKey) {
       .map((key) => `${key}=${params[key]}`)
       .join("&");
 
-    console.log(`String to sign: ${stringToSign}`);
+    //console.log(`String to sign: ${stringToSign}`);
 
     const privateKeyObj = forge.pki.privateKeyFromPem(privateKey);
     const md = forge.md.sha1.create();
     md.update(stringToSign, "utf8");
     const signature = privateKeyObj.sign(md);
     const encodedSignature = forge.util.encode64(signature);
-    console.log(`Signature (base64): ${encodedSignature}`);
+    //console.log(`Signature (base64): ${encodedSignature}`);
     return encodedSignature;
   } catch (error) {
     console.error(`Signature error: ${error.message}`);
@@ -145,16 +159,31 @@ function generateSignature(params, privateKey) {
  * @param {string} orderDetails.outTradeNo - Unique external trade number.
  * @param {number} orderDetails.amount - Total amount to be paid.
  * @param {string} orderDetails.phoneNum - Phone number associated with the MULTICAIXA account.
+ * @param {string} orderDetails.paymentMethod - Payment method.
  * @param {string} [orderDetails.subject="Purchase"] - Optional description of the transaction.
+ * @param {string} ip - Buyer IP address.
  * @returns {Promise<Object>} The API response from the PayPay server.
  * @throws {Error} If the request fails or the API returns an error.
  */
-async function createMulticaixaPayment(orderDetails) {
-  const { outTradeNo, amount, phoneNum, subject = "Purchase" } = orderDetails;
+async function createPayment(orderDetails, ip) {
+  const { outTradeNo, amount, phoneNum, subject = "Purchase", paymentMethod } = orderDetails;
+
+  let mul_pay_method = {
+    pay_product_code: "31",
+    amount: amount.toFixed(2),
+    bank_code: "MUL",
+    phone_num: phoneNum,
+  }
+
+  let ref_pay_method = {
+    pay_product_code: "31",
+    amount: amount.toFixed(2),
+    bank_code: "REF",
+  }
 
   const bizContent = {
     cashier_type: "SDK",
-    payer_ip: "123.25.68.9", // Replace with actual buyer IP
+    payer_ip: ip, // Replace with actual buyer IP
     sale_product_code: config.saleProductCode,
     timeout_express: "15m",
     trade_info: {
@@ -167,15 +196,10 @@ async function createMulticaixaPayment(orderDetails) {
       subject,
       total_amount: amount.toFixed(2),
     },
-    pay_method: {
-      pay_product_code: "31",
-      amount: amount.toFixed(2),
-      bank_code: "MUL",
-      phone_num: phoneNum,
-    },
+    pay_method: paymentMethod === "EXPRESS" ? mul_pay_method : ref_pay_method,
   };
 
-  console.log("biz_content:", JSON.stringify(bizContent, null, 2));
+  //console.log("biz_content:", JSON.stringify(bizContent, null, 2));
 
   const encryptedBizContent = encryptBizContentWithPrivateKey(
     JSON.stringify(bizContent),
@@ -192,7 +216,7 @@ async function createMulticaixaPayment(orderDetails) {
     sign_type: "RSA",
     version: "1.0",
     timestamp: generateTimestamp(),
-    language: "pt",
+    language: config.language,
   };
 
   params.sign = generateSignature(params, config.privateKey);
@@ -204,7 +228,7 @@ async function createMulticaixaPayment(orderDetails) {
       encodedParams[key] = encodeURIComponent(params[key]);
     });
 
-  console.log("Encoded params:", encodedParams);
+  //console.log("Encoded params:", encodedParams);
 
   try {
     const response = await axios.post(
@@ -263,7 +287,7 @@ async function createPayPayAppPayment(orderDetails, clientIp) {
     },
   };
 
-  console.log("biz_content:", JSON.stringify(bizContent, null, 2));
+  //console.log("biz_content:", JSON.stringify(bizContent, null, 2));
 
   const encryptedBizContent = encryptBizContentWithPrivateKey(
     JSON.stringify(bizContent),
@@ -280,7 +304,7 @@ async function createPayPayAppPayment(orderDetails, clientIp) {
     sign_type: "RSA",
     version: "1.0",
     timestamp: generateTimestamp(),
-    language: "pt",
+    language: config.language,
   };
 
   params.sign = generateSignature(params, config.privateKey);
@@ -292,7 +316,7 @@ async function createPayPayAppPayment(orderDetails, clientIp) {
       encodedParams[key] = encodeURIComponent(params[key]);
     });
 
-  console.log("Encoded params:", encodedParams);
+  //console.log("Encoded params:", encodedParams);
 
   try {
     const response = await axios.post(
@@ -325,22 +349,22 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for frontend requests
 
 /**
- * Route: POST /api/create
+ * Route: POST /api/create-payment
  * Handles MULTICAIXA Express payment creation from the client.
  *
- * @route POST /api/create
+ * @route POST /api/create-payment
  * @param {Request} req - Express request object (expects JSON body with total_amount, paymentMethod, and phone_num).
  * @param {Response} res - Express response object.
  * @returns {Object} JSON response with payment details or error message.
  */
-app.post("/api/create", async (req, res) => {
+app.post("/api/create-payment", async (req, res) => {
   try {
     const { total_amount, paymentMethod, phone_num } = req.body;
 
-    if (paymentMethod !== "MULTICAIXA_EXPRESS") {
+    if (String(paymentMethod).toUpperCase() !== "EXPRESS" && String(paymentMethod).toUpperCase() !== "REFERENCE") {
       return res.status(400).json({
         success: false,
-        error: "This endpoint supports only MULTICAIXA_EXPRESS payments",
+        error: "This endpoint supports only express or reference payments",
       });
     }
 
@@ -356,17 +380,20 @@ app.post("/api/create", async (req, res) => {
       amount: parseFloat(total_amount),
       phoneNum: phone_num,
       subject: "Purchase",
+      paymentMethod: paymentMethod,
     };
 
-    const result = await createMulticaixaPayment(orderDetails);
+    const result = await createPayment(orderDetails, req.ip);
 
     if (result.code === "S0001" && result.biz_content.status === "P") {
       res.json({
         success: true,
-        dynamic_link: result.biz_content.dynamic_link,
-        trade_token: result.biz_content.trade_token,
-        out_trade_no: result.biz_content.out_trade_no,
-        inner_trade_no: result.biz_content.trade_no,
+        dynamic_link: result.biz_content.dynamic_link || "",
+        trade_token: result.biz_content.trade_token || "",
+        out_trade_no: result.biz_content.out_trade_no || "",
+        inner_trade_no: result.biz_content.trade_no || "",
+        reference_id: result.biz_content.reference_id || "",
+        entity_id: result.biz_content.entity_id || "",
         total_amount: parseFloat(
           result.biz_content.total_amount || total_amount
         ),
@@ -386,7 +413,10 @@ app.post("/api/create", async (req, res) => {
     } else {
       res.json({
         success: false,
-        error: result.sub_msg || "Falha ao iniciar pagamento.",
+        code: result.code,
+        sub_code: result.sub_code,
+        message: result.msg || "Falha ao iniciar pagamento.",
+        description: result.sub_msg || "Falha ao iniciar pagamento.",
       });
     }
   } catch (err) {
@@ -404,7 +434,7 @@ app.post("/api/create", async (req, res) => {
  * @param {Response} res - Express response object.
  * @returns {Object} JSON response with payment link or error message.
  */
-app.post("/api/create-paypay-app", async (req, res) => {
+app.post("/api/paypay-app", async (req, res) => {
   try {
     const { total_amount, subject } = req.body;
 
@@ -422,7 +452,7 @@ app.post("/api/create-paypay-app", async (req, res) => {
     };
 
     const result = await createPayPayAppPayment(orderDetails, req.ip);
-    console.log(result);
+    //console.log(result);
     if (result.code === "S0001" && result.biz_content.status === "P") {
       res.json({
         success: true,
@@ -449,7 +479,10 @@ app.post("/api/create-paypay-app", async (req, res) => {
     } else {
       res.json({
         success: false,
-        error: result.sub_msg || "Falha ao iniciar pagamento.",
+        code: result.code,
+        sub_code: result.sub_code,
+        message: result.msg || "Falha ao iniciar pagamento.",
+        description: result.sub_msg || "Falha ao iniciar pagamento.",
       });
     }
   } catch (err) {
