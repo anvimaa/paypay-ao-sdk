@@ -458,6 +458,11 @@ app.post("/api/create-paypay-app", async (req, res) => {
   }
 });
 
+//create hello route
+app.get("/", (req, res) => {
+  res.json({ message: "Hello! PAY PAY API is running!" });
+});
+
 /**
  * Starts the Express server on the defined port.
  *
