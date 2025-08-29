@@ -6,6 +6,21 @@
 const express = require("express");
 const { createPayment, createPayPayAppPayment } = require("../services/paymentService");
 
+const PayPaySDK = require('../../lib');
+const dotenv = require('dotenv');
+
+// Carrega variáveis de ambiente
+dotenv.config();
+
+const sdk = new PayPaySDK({
+    partnerId: process.env.PAYPAY_PARTNER_ID,
+    privateKey: process.env.PAYPAY_PRIVATE_KEY,
+    paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
+    saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE,
+    language: 'en',
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'production',
+});
+
 const router = express.Router();
 
 /**
@@ -148,6 +163,39 @@ router.post("/paypay-app", async (req, res) => {
     } catch (err) {
         console.error("Error in /paypay-app:", err.message);
         res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+
+router.post('/multicaixa', async (req, res) => {
+    try {
+        const { amount, phoneNum, paymentMethod, description } = req.body;
+
+        const payment = await sdk.createMulticaixaPayment({
+            outTradeNo: sdk.generateTradeNumber('WEB_'),
+            amount: parseFloat(amount),
+            phoneNum,
+            paymentMethod,
+            subject: description || 'Pagamento Web'
+        }, {
+            clientIp: req.ip
+        });
+
+        if (payment.success) {
+            res.json({
+                success: true,
+                payment: {
+                    id: payment.data.tradeToken,
+                    link: payment.data.dynamicLink,
+                    amount: payment.data.totalAmount
+                }
+            });
+        } else {
+            res.status(400).json({ error: payment.error });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro interno' });
     }
 });
 

@@ -1,21 +1,76 @@
 {
-  "name": "paypay-demo",
+  "name": "@paypay-ao/sdk",
   "version": "1.0.0",
-  "dependencies": {
-    "axios": "^1.10.0",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "express": "^5.1.0",
-    "node-forge": "^1.3.1",
-    "qs": "^6.14.0",
-    "uuid": "^11.1.0",
-    "validator": "^13.15.15"
-  },
+  "description": "SDK oficial para integração de pagamentos PayPay Angola - MULTICAIXA Express e PayPay App",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "build": "echo 'No build step required for library'",
+    "prepublishOnly": "npm test",
+    "lint": "eslint lib/**/*.js",
+    "docs": "jsdoc lib/**/*.js -d docs"
+  },
+  "keywords": [
+    "paypay",
+    "payment",
+    "angola",
+    "multicaixa",
+    "sdk",
+    "payments",
+    "gateway",
+    "api",
+    "fintech",
+    "mobile-payment"
+  ],
+  "author": {
+    "name": "ANTONIO MANTENTE",
+    "email": "anvimaa@gmail.com",
+    "url": "https://anvima.vercel.app"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anvimaa/paypay-ao/payment-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/anvimaa/paypay-ao/payment-sdk/issues"
+  },
+  "homepage": "https://developer.paypay.ao",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "node-forge": "^1.3.1",
+    "qs": "^6.14.0",
+    "validator": "^13.15.15"
+  },
+  "peerDependencies": {
+    "crypto": "^1.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "eslint": "^8.57.0",
+    "express": "^5.1.0",
+    "jest": "^29.7.0",
+    "jsdoc": "^4.0.2",
     "nodemon": "^3.1.10"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
