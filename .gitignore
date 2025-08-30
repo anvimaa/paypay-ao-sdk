@@ -136,7 +136,7 @@ Thumbs.db
 # Build output
 dist/
 build/
-lib/
+# lib/
 out/
 
 # Test output

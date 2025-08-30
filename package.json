@@ -1,5 +1,5 @@
 {
-  "name": "@paypay-ao/sdk",
+  "name": "paypay-ao-sdk",
   "version": "1.0.0",
   "description": "SDK oficial para integração de pagamentos PayPay Angola - MULTICAIXA Express e PayPay App",
   "main": "lib/index.js",
@@ -17,7 +17,6 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "build": "echo 'No build step required for library'",
-    "prepublishOnly": "npm test",
     "lint": "eslint lib/**/*.js",
     "docs": "jsdoc lib/**/*.js -d docs"
   },
@@ -41,12 +40,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anvimaa/paypay-ao/payment-sdk.git"
+    "url": "git+https://github.com/anvimaa/paypay-ao-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/anvimaa/paypay-ao/payment-sdk/issues"
+    "url": "https://github.com/anvimaa/paypay-ao-sdk/issues"
   },
-  "homepage": "https://developer.paypay.ao",
+  "homepage": "https://portal.paypayafrica.com/passport/apidoc/guide",
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
