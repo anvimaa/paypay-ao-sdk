@@ -3,12 +3,57 @@ const forge = require("node-forge");
 const crypto = require("crypto");
 const qs = require("qs");
 
+/**
+ * PayPay AO SDK - Cliente JavaScript para integração com a API PayPay
+ * 
+ * Este SDK fornece uma interface simplificada para interagir com os serviços de pagamento
+ * da PayPay Africa, incluindo pagamentos via Multicaixa Express, referência bancária
+ * e aplicação PayPay.
+ * 
+ * Funcionalidades principais:
+ * - Criação de pagamentos instantâneos
+ * - Suporte para Multicaixa Express
+ * - Geração de referências bancárias
+ * - Pagamentos via aplicação PayPay
+ * - Verificação de assinaturas de resposta
+ * - Criptografia RSA para segurança
+ * 
+ * @author PayPay AO SDK
+ * @version 1.0.0
+ * @since 2025
+ * 
+ * @example
+ * const PayPaySDK = require('paypaySDK');
+ * 
+ * const sdk = new PayPaySDK({
+ *   partnerId: 'seu_partner_id',
+ *   privateKey: 'sua_chave_privada_pem',
+ *   paypayPublicKey: 'chave_publica_paypay_pem'
+ * });
+ * 
+ * // Criar pagamento Multicaixa Express
+ * const payment = await sdk.createMulticaixaPayment({
+ *   outTradeNo: 'ORDER-123456',
+ *   amount: 1000.50,
+ *   phoneNum: '923123456',
+ *   subject: 'Compra de produto'
+ * });
+ */
 class PayPaySDK {
+    /**
+     * Creates a new PayPay SDK instance
+     * @param {Object} config - SDK configuration
+     * @param {string} config.partnerId - Merchant partner ID
+     * @param {string} config.privateKey - RSA private key in PEM format
+     * @param {string} config.paypayPublicKey - PayPay public key in PEM format
+     * @param {string} [config.language='pt'] - Language preference (pt/en)
+     * @param {string} [config.saleProductCode] - Sale product code
+     */
     constructor(config) {
         this.config = {
             apiUrl: "https://gateway.paypayafrica.com/recv.do",
             saleProductCode: "050200001",
-            language: "pt",
+            language: "en",
             ...config,
         };
         this._validateConfig();
@@ -111,7 +156,7 @@ class PayPaySDK {
             });
 
         // Evita double-encoding no qs.stringify
-        const body = qs.stringify(encodedParams, { encode: false });
+        const body = qs.stringify(encodedParams);
 
         try {
             const resp = await axios.post(this.config.apiUrl, body, {
@@ -129,14 +174,14 @@ class PayPaySDK {
     async createPayment({ outTradeNo, amount, phoneNum, subject = "Purchase", payerIp, paymentMethod }) {
         const mul_pay_method = {
             pay_product_code: "31",
-            amount: amount,
+            amount: Number(amount).toFixed(2),
             bank_code: "MUL",
             phone_num: phoneNum,
         };
 
         const ref_pay_method = {
             pay_product_code: "31",
-            amount: amount,
+            amount: Number(amount).toFixed(2),
             bank_code: "REF",
         };
 
@@ -150,10 +195,10 @@ class PayPaySDK {
                 out_trade_no: outTradeNo,
                 payee_identity: this.config.partnerId,
                 payee_identity_type: "1",
-                price: amount,
+                price: Number(amount).toFixed(2),
                 quantity: "1",
                 subject,
-                total_amount: amount,
+                total_amount: Number(amount).toFixed(2),
             },
             pay_method: paymentMethod === "EXPRESS" ? mul_pay_method : ref_pay_method,
         };
@@ -162,6 +207,7 @@ class PayPaySDK {
     }
 
     async createMulticaixaPayment({ outTradeNo, amount, phoneNum, subject = "Purchase", payerIp }) {
+        console.log("IP da Maquina: ", payerIp)
         if (!phoneNum) throw new Error("phoneNum é obrigatório para Multicaixa Express");
         return this.createPayment({ outTradeNo, amount, phoneNum, subject, payerIp, paymentMethod: "EXPRESS" });
     }
@@ -181,10 +227,10 @@ class PayPaySDK {
                 out_trade_no: outTradeNo,
                 payee_identity: this.config.partnerId,
                 payee_identity_type: "1",
-                price: amount.toFixed(2),
+                price: Number(amount).toFixed(2),
                 quantity: "1",
                 subject,
-                total_amount: amount.toFixed(2),
+                total_amount: Number(amount).toFixed(2),
             },
         };
         return this._send("instant_trade", bizContent);

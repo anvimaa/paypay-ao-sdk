@@ -59,18 +59,17 @@ router.post("/test", async (req, res) => {
     const { amount, phoneNum } = req.body;
 
     try {
-        const outTradeNo = PayPaySDK.generateUniqueOrderNo("TX-");
-        const resp = await sdk.createMulticaixaPayment({
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("MUL-");
+        console.log(outTradeNo);
+        const resp = await sdk.createReferencePayment({
             outTradeNo,
             amount: amount,
-            phoneNum: phoneNum,
+            //phoneNum: phoneNum,
             payerIp: req.ip,
         });
-        console.log(resp);
         res.json(resp);
     } catch (err) {
         console.error(err);
-
         res.status(500).json({ error: 'Erro interno', err });
     }
 })
