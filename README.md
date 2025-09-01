@@ -1,6 +1,6 @@
 # PayPay AO SDK
 
-[![npm version](https://img.shields.io/npm/v/@paypay-ao/payment-sdk.svg)](https://www.npmjs.com/package/@paypay-ao/payment-sdk)
+[![npm version](https://img.shields.io/npm/v/paypay-ao-sdk.svg)](https://www.npmjs.com/package/paypay-ao-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
@@ -20,13 +20,13 @@ SDK oficial para integração de pagamentos PayPay Angola. Suporte completo para
 ## 📦 Instalação
 
 ```bash
-npm install @paypay-ao/sdk
+npm install paypay-ao-sdk
 ```
 
 ou
 
 ```bash
-pnpm add @paypay-ao/sdk
+pnpm add paypay-ao-sdk
 ```
 
 ## 🔧 Configuração Inicial
@@ -41,7 +41,7 @@ Para usar o SDK, você precisará de:
 ### 2. Inicialização Básica
 
 ```javascript
-const PayPaySDK = require('@paypay-ao/sdk');
+const PayPaySDK = require('paypay-ao-sdk');
 
 const sdk = new PayPaySDK({
   partnerId: 'SEU_PARTNER_ID',
@@ -59,7 +59,7 @@ CHAVE_PUBLICA_PAYPAY
 ### 3. Inicialização Rápida
 
 ```javascript
-const { quickStart } = require('@paypay-ao/sdk');
+const { quickStart } = require('paypay-ao-sdk');
 
 // Para sandbox
 const sandboxSDK = quickStart.createSandboxSDK(
@@ -167,7 +167,7 @@ console.log('Trade Number:', tradeNo);
 ### Tratamento de Erros
 
 ```javascript
-const { PayPayError, PayPayValidationError, PayPayNetworkError } = require('@paypay-ao/payment-sdk');
+const { PayPayError, PayPayValidationError, PayPayNetworkError } = require('paypay-ao-sdk');
 
 try {
   const payment = await sdk.createMulticaixaPayment(orderData);
@@ -208,7 +208,7 @@ if (sdk.isSandbox()) {
 ### Gestão de Chaves
 
 ```javascript
-const { CryptoUtils } = require('@paypay-ao/payment-sdk');
+const { CryptoUtils } = require('paypay-ao-sdk');
 
 // Validar chave privada
 try {
@@ -233,7 +233,7 @@ try {
 ### QR Code
 
 ```javascript
-const { PayPayAppPayment } = require('@paypay-ao/payment-sdk');
+const { PayPayAppPayment } = require('paypay-ao-sdk');
 
 const payment = await sdk.createPayPayAppPayment(orderDetails);
 
@@ -265,7 +265,7 @@ if (!appInstalled) {
 O SDK inclui definições TypeScript completas:
 
 ```typescript
-import PayPaySDK, { PayPaySDKConfig, PaymentResponse } from '@paypay-ao/payment-sdk';
+import PayPaySDK, { PayPaySDKConfig, PaymentResponse } from 'paypay-ao-sdk';
 
 const config: PayPaySDKConfig = {
   partnerId: 'PARTNER_ID',
@@ -302,7 +302,7 @@ npm run test:watch
 ### Constantes Disponíveis
 
 ```javascript
-const { constants } = require('@paypay-ao/payment-sdk');
+const { constants } = require('paypay-ao-sdk');
 
 console.log('Ambientes:', constants.ENVIRONMENTS);
 console.log('Métodos de pagamento:', constants.PAYMENT_METHODS);
@@ -313,7 +313,7 @@ console.log('Timeouts:', constants.TIMEOUT);
 ### Funções Utilitárias
 
 ```javascript
-const { utils } = require('@paypay-ao/payment-sdk');
+const { utils } = require('paypay-ao-sdk');
 
 // Gerar número de transação
 const tradeNo = utils.generateTradeNumber('PREFIX_');

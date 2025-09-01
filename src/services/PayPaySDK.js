@@ -216,6 +216,7 @@ class PayPaySDK {
         return this.createPayment({ outTradeNo, amount, subject, payerIp, paymentMethod: "REFERENCE" });
     }
 
+
     async createPayPayAppPayment({ outTradeNo, amount, subject = "Purchase", payerIp }) {
         const bizContent = {
             cashier_type: "SDK",
@@ -234,6 +235,106 @@ class PayPaySDK {
             },
         };
         return this._send("instant_trade", bizContent);
+    }
+
+    /**
+     * Consulta o status de um pedido de pagamento
+     * 
+     * Este método permite verificar o status atual de um pedido de pagamento
+     * usando o número único do pedido do comerciante (out_trade_no).
+     * 
+     * @async
+     * @param {string} outTradeNo - Número único do pedido do comerciante para consulta
+     * @returns {Promise<Object>} Resposta da API contendo informações do status do pedido
+     * @throws {Error} Lança erro se outTradeNo não for fornecido ou se houver falha na comunicação com a API
+     * 
+     * @example
+     * // Consultar status de um pedido
+     * try {
+     *   const status = await sdk.orderStatus('ORDER-123456789');
+     *   console.log('Status do pedido:', status);
+     *   
+     *   if (status.code === '10000') {
+     *     console.log('Status da transação:', status.trade_status);
+     *   }
+     * } catch (error) {
+     *   console.error('Erro ao consultar status:', error.message);
+     * }
+     * 
+     * @example
+     * // Resposta típica de sucesso
+     * {
+     *   "code": "10000",
+     *   "msg": "Success",
+     *   "sub_code": "",
+     *   "sub_msg": "",
+     *   "trade_no": "2025010112345678",
+     *   "out_trade_no": "ORDER-123456789",
+     *   "trade_status": "TRADE_SUCCESS",
+     *   "total_amount": "1000.50",
+     *   "currency": "AOA",
+     *   "gmt_payment": "2025-01-01 12:30:45"
+     * }
+     * 
+     * @example
+     * // Possíveis valores de trade_status:
+     * // - WAIT_BUYER_PAY: Aguardando pagamento do comprador
+     * // - TRADE_SUCCESS: Pagamento realizado com sucesso
+     * // - TRADE_FINISHED: Transação finalizada
+     * // - TRADE_CLOSED: Transação cancelada/fechada
+     * 
+     * @since 1.0.0
+     */
+    async orderStatus(outTradeNo) {
+
+        const bizContent = {
+            out_trade_no: outTradeNo,
+        };
+
+        return this._send("trade_query", bizContent);
+    }
+
+    /**
+     * Cancela um pedido de pagamento
+     * 
+     * Este método permite cancelar um pedido de pagamento que ainda não foi processado.
+     * O cancelamento só é possível para pedidos que estão em estado pendente.
+     * 
+     * @async
+     * @param {string} outTradeNo - Número único do pedido do comerciante que será cancelado
+     * @returns {Promise<Object>} Resposta da API contendo o resultado do cancelamento
+     * @throws {Error} Lança erro se outTradeNo não for fornecido ou se houver falha na comunicação com a API
+     * 
+     * @example
+     * // Cancelar um pedido
+     * try {
+     *   const result = await sdk.closeOrder('ORDER-123456789');
+     *   console.log('Pedido cancelado:', result);
+     * } catch (error) {
+     *   console.error('Erro ao cancelar pedido:', error.message);
+     * }
+     * 
+     * @example
+     * // Resposta típica de sucesso
+     * {
+     *   "code": "10000",
+     *   "msg": "Success",
+     *   "sub_code": "",
+     *   "sub_msg": "",
+     *   "trade_no": "2025010112345678",
+     *   "out_trade_no": "ORDER-123456789",
+     *   "trade_status": "TRADE_CLOSED"
+     * }
+     * 
+     * @since 1.0.0
+     */
+    async closeOrder(outTradeNo) {
+
+        const bizContent = {
+            out_trade_no: outTradeNo,
+        };
+
+        return this._send("trade_close", bizContent);
     }
 
     verifyResponseSignature(response) {

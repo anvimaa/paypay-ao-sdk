@@ -10,7 +10,6 @@ const dotenv = require('dotenv');
 // Carrega variáveis de ambiente
 dotenv.config();
 
-
 const sdk = new PayPaySDK({
     partnerId: process.env.PAYPAY_PARTNER_ID,
     privateKey: process.env.PAYPAY_PRIVATE_KEY,
@@ -19,15 +18,7 @@ const sdk = new PayPaySDK({
 
 const router = express.Router();
 
-/**
- * Route: GET /
- * Health check endpoint
- *
- * @route GET /
- * @param {Request} req - Express request object.
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with welcome message.
- */
+
 router.get("/", (req, res) => {
     res.json({
         message: "Hello! PAY PAY API is running!",
@@ -36,15 +27,6 @@ router.get("/", (req, res) => {
     });
 });
 
-/**
- * Route: GET /health
- * Detailed health check endpoint
- *
- * @route GET /health
- * @param {Request} req - Express request object.
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with health status.
- */
 router.get("/health", (req, res) => {
     res.json({
         status: "healthy",
@@ -55,18 +37,71 @@ router.get("/health", (req, res) => {
     });
 });
 
-router.post("/test", async (req, res) => {
+router.post("/test-multicaixa", async (req, res) => {
     const { amount, phoneNum } = req.body;
 
     try {
         const outTradeNo = PayPaySDK.generateUniqueOrderNo("MUL-");
-        console.log(outTradeNo);
+        const resp = await sdk.createMulticaixaPayment({
+            outTradeNo,
+            amount: amount,
+            phoneNum: phoneNum,
+            payerIp: req.ip,
+        });
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno', err });
+    }
+})
+
+router.post("/test-reference", async (req, res) => {
+    const { amount } = req.body;
+    try {
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("REF-");
         const resp = await sdk.createReferencePayment({
             outTradeNo,
             amount: amount,
-            //phoneNum: phoneNum,
             payerIp: req.ip,
         });
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno', err });
+    }
+})
+
+router.post("/test-paypayapp", async (req, res) => {
+    const { amount } = req.body;
+    try {
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYPAY-");
+        const resp = await sdk.createPayPayAppPayment({
+            outTradeNo,
+            amount: amount,
+            payerIp: req.ip,
+        });
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno', err });
+    }
+})
+
+router.post("/test-consult", async (req, res) => {
+    const { outTradeNo } = req.body;
+    try {
+        const resp = await sdk.orderStatus(outTradeNo);
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno', err });
+    }
+})
+
+router.post("/test-close", async (req, res) => {
+    const { outTradeNo } = req.body;
+    try {
+        const resp = await sdk.closeOrder(outTradeNo);
         res.json(resp);
     } catch (err) {
         console.error(err);
