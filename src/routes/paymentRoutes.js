@@ -6,7 +6,7 @@
 const express = require("express");
 const { createPayment, createPayPayAppPayment } = require("../services/paymentService");
 
-const PayPaySDK = require('../../lib');
+const PayPaySDK = require('paypay-ao-sdk');
 const dotenv = require('dotenv');
 
 // Carrega variáveis de ambiente

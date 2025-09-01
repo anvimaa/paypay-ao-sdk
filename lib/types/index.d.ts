@@ -3,7 +3,7 @@
  * Official SDK for PayPay Angola payment integration
  */
 
-declare module '@paypay-ao/sdk' {
+declare module 'paypay-ao-sdk' {
   // Configuration interfaces
   export interface PayPaySDKConfig {
     partnerId: string;
@@ -205,6 +205,10 @@ declare module '@paypay-ao/sdk' {
     createReferencePayment(
       orderDetails: OrderDetails,
       options?: PaymentOptions
+    ): Promise<PaymentResponse>;
+
+    queryPaymentOrderStatus(
+      outTradeNo: string,
     ): Promise<PaymentResponse>;
 
     // Configuration methods
