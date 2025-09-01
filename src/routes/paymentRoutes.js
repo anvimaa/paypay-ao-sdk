@@ -23,15 +23,6 @@ const sdk = new PayPaySDK({
 
 const router = express.Router();
 
-/**
- * Route: POST /create-payment
- * Handles MULTICAIXA Express payment creation from the client.
- *
- * @route POST /create-payment
- * @param {Request} req - Express request object (expects JSON body with total_amount, paymentMethod, and phone_num).
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with payment details or error message.
- */
 router.post("/create-payment", async (req, res) => {
     try {
         const { total_amount, paymentMethod, phone_num } = req.body;
@@ -100,15 +91,6 @@ router.post("/create-payment", async (req, res) => {
     }
 });
 
-/**
- * Route: POST /paypay-app
- * Handles PayPay App payment creation from the client.
- *
- * @route POST /paypay-app
- * @param {Request} req - Express request object (expects total_amount and optional subject).
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with payment link or error message.
- */
 router.post("/paypay-app", async (req, res) => {
     try {
         const { total_amount, subject } = req.body;
@@ -166,7 +148,6 @@ router.post("/paypay-app", async (req, res) => {
     }
 });
 
-
 router.post('/multicaixa', async (req, res) => {
     try {
         const { amount, phoneNum, paymentMethod, description } = req.body;
@@ -198,5 +179,20 @@ router.post('/multicaixa', async (req, res) => {
         res.status(500).json({ error: 'Erro interno' });
     }
 });
+
+router.post('/consult', async (req, res) => {
+    const { outTradeNo } = req.body;
+    try {
+        const result = await sdk.queryPaymentOrderStatus(outTradeNo)
+        if (result.success) {
+            res.json(result)
+        } else {
+            res.status(400).json({ error: result.error });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+})
 
 module.exports = router;
