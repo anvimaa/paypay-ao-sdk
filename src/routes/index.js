@@ -4,6 +4,18 @@
  */
 
 const express = require("express");
+const PayPaySDK = require("../services/PayPaySDK");
+const dotenv = require('dotenv');
+
+// Carrega variáveis de ambiente
+dotenv.config();
+
+
+const sdk = new PayPaySDK({
+    partnerId: process.env.PAYPAY_PARTNER_ID,
+    privateKey: process.env.PAYPAY_PRIVATE_KEY,
+    paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
+});
 
 const router = express.Router();
 
@@ -42,5 +54,25 @@ router.get("/health", (req, res) => {
         uptime: process.uptime()
     });
 });
+
+router.post("/test", async (req, res) => {
+    const { amount, phoneNum } = req.body;
+
+    try {
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("TX-");
+        const resp = await sdk.createMulticaixaPayment({
+            outTradeNo,
+            amount: amount,
+            phoneNum: phoneNum,
+            payerIp: req.ip,
+        });
+        console.log(resp);
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+
+        res.status(500).json({ error: 'Erro interno', err });
+    }
+})
 
 module.exports = router;
