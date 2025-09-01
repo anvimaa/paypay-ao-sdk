@@ -1,7 +1,7 @@
 {
   "name": "paypay-ao-sdk",
-  "version": "1.0.0",
-  "description": "SDK oficial para integração de pagamentos PayPay Angola - MULTICAIXA Express e PayPay App",
+  "version": "1.0.1",
+  "description": "SDK oficial para integração de pagamentos PayPay AO - MULTICAIXA Express e PayPay App",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
   "files": [
