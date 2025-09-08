@@ -4,7 +4,7 @@
  */
 
 const express = require("express");
-const PayPaySDK = require("../../lib");
+const PayPaySDK = require("paypay-ao-sdk");
 const dotenv = require('dotenv');
 
 // Carrega variáveis de ambiente
@@ -38,7 +38,7 @@ router.get("/health", (req, res) => {
     });
 });
 
-router.post("/test-multicaixa", async (req, res) => {
+router.post("/test-express", async (req, res) => {
     const { amount, phoneNum } = req.body;
 
     try {
@@ -52,7 +52,7 @@ router.post("/test-multicaixa", async (req, res) => {
         res.json(resp);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro interno', err });
+        res.status(500).json({ error: 'Erro interno' });
     }
 })
 
@@ -68,7 +68,7 @@ router.post("/test-reference", async (req, res) => {
         res.json(resp);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro interno', err });
+        res.status(500).json({ error: 'Erro interno' });
     }
 })
 
@@ -84,7 +84,7 @@ router.post("/test-paypayapp", async (req, res) => {
         res.json(resp);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro interno', err });
+        res.status(500).json({ error: 'Erro interno' });
     }
 })
 
@@ -106,7 +106,7 @@ router.post("/test-close", async (req, res) => {
         res.json(resp);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro interno', err });
+        res.status(500).json({ error: 'Erro interno' });
     }
 })
 
