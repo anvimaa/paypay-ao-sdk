@@ -14,6 +14,7 @@ const sdk = new PayPaySDK({
     partnerId: process.env.PAYPAY_PARTNER_ID,
     privateKey: process.env.PAYPAY_PRIVATE_KEY,
     paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
+    saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE
 });
 
 const router = express.Router();
@@ -94,7 +95,7 @@ router.post("/test-consult", async (req, res) => {
         res.json(resp);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro interno', err });
+        res.status(500).json({ message: 'Erro interno' });
     }
 })
 

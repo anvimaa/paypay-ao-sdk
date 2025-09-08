@@ -18,7 +18,7 @@ const qs = require("qs");
  * - Verificação de assinaturas de resposta
  * - Criptografia RSA para segurança
  * 
- * @author PayPay AO SDK
+ * @author anvimaa
  * @version 1.0.0
  * @since 2025
  * 
@@ -48,6 +48,7 @@ class PayPaySDK {
      * @param {string} config.paypayPublicKey - PayPay public key in PEM format
      * @param {string} [config.language='pt'] - Language preference (pt/en)
      * @param {string} [config.saleProductCode] - Sale product code
+     * @param {string} [config.apiUrl='https://gateway.paypayafrica.com/recv.do'] - The API URL
      */
     constructor(config) {
         this.config = {
@@ -64,6 +65,8 @@ class PayPaySDK {
         if (!partnerId) throw new Error("partnerId é obrigatório");
         if (!privateKey) throw new Error("privateKey é obrigatório");
         this._validatePemKey(privateKey, "PRIVATE KEY");
+        console.log("SALE PRODUCT CODE: ", this.config.saleProductCode)
+        console.log("PARTERNER ID: ", this.config.partnerId)
         if (paypayPublicKey) this._validatePemKey(paypayPublicKey, "PUBLIC KEY");
     }
 
