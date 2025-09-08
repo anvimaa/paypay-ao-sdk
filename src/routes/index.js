@@ -4,7 +4,7 @@
  */
 
 const express = require("express");
-const PayPaySDK = require("../services/PayPaySDK");
+const PayPaySDK = require("../../lib");
 const dotenv = require('dotenv');
 
 // Carrega variáveis de ambiente
