@@ -6,17 +6,23 @@
 const express = require("express");
 const { createPayment, createPayPayAppPayment } = require("../services/paymentService");
 
+const PayPaySDK = require('paypay-ao-sdk');
+const dotenv = require('dotenv');
+
+// Carrega variáveis de ambiente
+dotenv.config();
+
+const sdk = new PayPaySDK({
+    partnerId: process.env.PAYPAY_PARTNER_ID,
+    privateKey: process.env.PAYPAY_PRIVATE_KEY,
+    paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
+    saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE,
+    language: 'en',
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'production',
+});
+
 const router = express.Router();
 
-/**
- * Route: POST /create-payment
- * Handles MULTICAIXA Express payment creation from the client.
- *
- * @route POST /create-payment
- * @param {Request} req - Express request object (expects JSON body with total_amount, paymentMethod, and phone_num).
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with payment details or error message.
- */
 router.post("/create-payment", async (req, res) => {
     try {
         const { total_amount, paymentMethod, phone_num } = req.body;
@@ -85,15 +91,6 @@ router.post("/create-payment", async (req, res) => {
     }
 });
 
-/**
- * Route: POST /paypay-app
- * Handles PayPay App payment creation from the client.
- *
- * @route POST /paypay-app
- * @param {Request} req - Express request object (expects total_amount and optional subject).
- * @param {Response} res - Express response object.
- * @returns {Object} JSON response with payment link or error message.
- */
 router.post("/paypay-app", async (req, res) => {
     try {
         const { total_amount, subject } = req.body;
@@ -150,5 +147,52 @@ router.post("/paypay-app", async (req, res) => {
         res.status(400).json({ success: false, error: err.message });
     }
 });
+
+router.post('/multicaixa', async (req, res) => {
+    try {
+        const { amount, phoneNum, paymentMethod, description } = req.body;
+
+        const payment = await sdk.createMulticaixaPayment({
+            outTradeNo: sdk.generateTradeNumber('WEB_'),
+            amount: parseFloat(amount),
+            phoneNum,
+            paymentMethod,
+            subject: description || 'Pagamento Web'
+        }, {
+            clientIp: req.ip
+        });
+
+        if (payment.success) {
+            res.json({
+                success: true,
+                payment: {
+                    id: payment.data.tradeToken,
+                    link: payment.data.dynamicLink,
+                    amount: payment.data.totalAmount
+                }
+            });
+        } else {
+            res.status(400).json({ error: payment.error });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+router.post('/consult', async (req, res) => {
+    const { outTradeNo } = req.body;
+    try {
+        const result = await sdk.queryPaymentOrderStatus(outTradeNo)
+        if (result.success) {
+            res.json(result)
+        } else {
+            res.status(400).json({ error: result.error });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+})
 
 module.exports = router;

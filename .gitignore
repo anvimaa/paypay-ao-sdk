@@ -4,6 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+.qoder/
+
 # Runtime data
 pids
 *.pid
@@ -136,7 +138,7 @@ Thumbs.db
 # Build output
 dist/
 build/
-lib/
+# lib/
 out/
 
 # Test output
