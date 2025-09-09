@@ -4,7 +4,8 @@
  */
 
 const express = require("express");
-const PayPaySDK = require("paypay-ao-sdk");
+//const PayPaySDK = require("paypay-ao-sdk");
+const PayPaySDK = require("../../lib");
 const dotenv = require('dotenv');
 
 // Carrega variáveis de ambiente
@@ -14,7 +15,8 @@ const sdk = new PayPaySDK({
     partnerId: process.env.PAYPAY_PARTNER_ID,
     privateKey: process.env.PAYPAY_PRIVATE_KEY,
     paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
-    saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE
+    saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE,
+    language: 'pt'
 });
 
 const router = express.Router();
@@ -43,11 +45,12 @@ router.post("/test-express", async (req, res) => {
 
     try {
         const outTradeNo = PayPaySDK.generateUniqueOrderNo("MUL-");
+        const ip = await PayPaySDK.getIp();
         const resp = await sdk.createMulticaixaPayment({
             outTradeNo,
             amount: amount,
             phoneNum: phoneNum,
-            payerIp: req.ip,
+            payerIp: ip,
         });
         res.json(resp);
     } catch (err) {
@@ -60,10 +63,11 @@ router.post("/test-reference", async (req, res) => {
     const { amount } = req.body;
     try {
         const outTradeNo = PayPaySDK.generateUniqueOrderNo("REF-");
+        const ip = await PayPaySDK.getIp();
         const resp = await sdk.createReferencePayment({
             outTradeNo,
             amount: amount,
-            payerIp: req.ip,
+            payerIp: ip,
         });
         res.json(resp);
     } catch (err) {
@@ -76,10 +80,11 @@ router.post("/test-paypayapp", async (req, res) => {
     const { amount } = req.body;
     try {
         const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYPAY-");
+        const ip = await PayPaySDK.getIp();
         const resp = await sdk.createPayPayAppPayment({
             outTradeNo,
             amount: amount,
-            payerIp: req.ip,
+            payerIp: ip,
         });
         res.json(resp);
     } catch (err) {
