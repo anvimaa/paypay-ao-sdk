@@ -16,7 +16,7 @@ const sdk = new PayPaySDK({
     privateKey: process.env.PAYPAY_PRIVATE_KEY,
     paypayPublicKey: process.env.PAYPAY_PUBLIC_KEY,
     saleProductCode: process.env.PAYPAY_SALE_PRODUCT_CODE,
-    language: 'pt'
+    language: 'en'
 });
 
 const router = express.Router();

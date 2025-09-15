@@ -1,6 +1,6 @@
 {
   "name": "paypay-ao-sdk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "SDK oficial para integração de pagamentos PayPay AO - MULTICAIXA Express e PayPay App",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
