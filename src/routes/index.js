@@ -21,7 +21,6 @@ const sdk = new PayPaySDK({
 
 const router = express.Router();
 
-
 router.get("/", (req, res) => {
     res.json({
         message: "Hello! PAY PAY API is running!",
@@ -44,10 +43,11 @@ router.post("/test-express", async (req, res) => {
     const { amount, phoneNum } = req.body;
 
     try {
-        const outTradeNo = PayPaySDK.generateUniqueOrderNo("MUL-");
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("MUL");
+        console.log(outTradeNo);
         const ip = await PayPaySDK.getIp();
         const resp = await sdk.createMulticaixaPayment({
-            outTradeNo,
+            outTradeNo: outTradeNo,
             amount: amount,
             phoneNum: phoneNum,
             payerIp: ip,
@@ -62,10 +62,10 @@ router.post("/test-express", async (req, res) => {
 router.post("/test-reference", async (req, res) => {
     const { amount } = req.body;
     try {
-        const outTradeNo = PayPaySDK.generateUniqueOrderNo("REF-");
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("REF");
         const ip = await PayPaySDK.getIp();
         const resp = await sdk.createReferencePayment({
-            outTradeNo,
+            outTradeNo: outTradeNo,
             amount: amount,
             payerIp: ip,
         });
@@ -79,10 +79,11 @@ router.post("/test-reference", async (req, res) => {
 router.post("/test-paypayapp", async (req, res) => {
     const { amount } = req.body;
     try {
-        const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYPAY-");
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYPAY");
+        console.log(outTradeNo, outTradeNo.length);
         const ip = await PayPaySDK.getIp();
         const resp = await sdk.createPayPayAppPayment({
-            outTradeNo,
+            outTradeNo: outTradeNo,
             amount: amount,
             payerIp: ip,
         });

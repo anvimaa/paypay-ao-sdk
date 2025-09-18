@@ -1,3 +1,4 @@
+
 /**
  * Middleware module for PayPay AO SDK
  * Contains common middleware functions for request processing
@@ -47,9 +48,10 @@ function errorHandler(err, req, res, next) {
  * @param {Response} res - Express response object
  * @param {Function} next - Next middleware function
  */
-function requestLogger(req, res, next) {
+async function requestLogger(req, res, next) {
+    const ip = await require('paypay-ao-sdk').getIp()
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${req.ip}`);
+    console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${ip}`);
     next();
 }
 
