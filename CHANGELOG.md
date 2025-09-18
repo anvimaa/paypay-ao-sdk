@@ -5,6 +5,192 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.0.0] - 2025-01-18
+
+### 🎉 Versão Major - TypeScript Nativo
+
+#### ✨ Novidades Principais
+- **TypeScript Nativo**: Reescrito completamente em TypeScript com tipagem robusta
+- **Dual Package**: Suporte simultâneo para CommonJS e ESM
+- **Type Safety**: Prevenção de erros em tempo de compilação
+- **Melhor DX**: IntelliSense aprimorado e autocompletar em IDEs
+- **Backward Compatibility**: 100% compatível com v1.x
+
+#### 🔧 Mudanças Técnicas
+
+##### Arquitetura
+- Migração completa da base de código para TypeScript
+- Sistema de build dual (CommonJS + ESM) com tsc
+- Estrutura modular reorganizada:
+  - `src/types/` - Definições de tipos centralizadas
+  - `src/errors/` - Classes de erro tipadas
+  - `src/utils/` - Utilitários tipados
+  - `src/PayPaySDK.ts` - Classe principal
+
+##### Sistema de Build
+- **Build CJS**: `lib/cjs/` para compatibilidade CommonJS
+- **Build ESM**: `lib/esm/` para suporte a ES Modules
+- **Tipos**: `lib/types/` para definições TypeScript
+- Scripts de build automatizados com validação
+
+##### Tipos Adicionados
+```typescript
+// Configuração
+interface PayPayConfig
+interface PayPayOptions
+interface PayPayInternalConfig
+
+// Pagamentos
+interface PaymentRequest
+interface MulticaixaPaymentRequest  
+interface PaymentResponse
+interface OrderStatusResponse
+type PaymentMethod = 'EXPRESS' | 'REFERENCE' | 'PAYPAY_APP'
+type TradeStatus = 'WAIT_BUYER_PAY' | 'TRADE_SUCCESS' | 'TRADE_FINISHED' | 'TRADE_CLOSED'
+
+// Validação
+interface ValidationResult<T>
+interface PhoneValidationResult
+interface AmountValidationOptions
+
+// API
+interface ApiRequestParams
+interface BizContent
+interface TradeInfo
+```
+
+##### Classes de Erro Tipadas
+- `PayPayError` - Erro base com código e detalhes tipados
+- `ValidationError` - Erro de validação com campo e formato esperado
+- `ApiError` - Erro de API com status HTTP e resposta
+- Type guards: `isPayPayError()`, `isValidationError()`, `isApiError()`
+
+##### Utilitários Tipados
+- `Validators` - Classe com métodos de validação tipados
+- `CryptoUtils` - Operações criptográficas tipadas
+- `Helpers` - Funções auxiliares tipadas
+- Exportações estáticas para compatibilidade
+
+#### 📦 Package Updates
+
+##### Exportações Dual
+```json
+{
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js", 
+  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js",
+      "types": "./lib/types/index.d.ts"
+    }
+  }
+}
+```
+
+##### Scripts Atualizados
+- `build` - Build completo (CJS + ESM + Types)
+- `build:cjs` - Build CommonJS
+- `build:esm` - Build ES Modules
+- `build:types` - Geração de definições de tipos
+- `test:types` - Verificação de tipos TypeScript
+- `lint` - ESLint para TypeScript
+
+##### Dependências
+- **Adicionadas**:
+  - `typescript@^5.0.0`
+  - `ts-jest@^29.0.0`
+  - `@types/node@^20.0.0`
+  - `@types/node-forge@^1.3.0`
+  - `@types/validator@^13.11.0`
+  - `@types/qs@^6.9.0`
+  - `@typescript-eslint/parser@^6.0.0`
+  - `@typescript-eslint/eslint-plugin@^6.0.0`
+  - `prettier@^3.0.0`
+  - `rimraf@^5.0.0`
+
+#### 🔄 Compatibilidade e Migração
+
+##### Mudanças na Importação
+```javascript
+// v1.x - Ainda funciona
+const PayPaySDK = require('paypay-ao-sdk');
+
+// v2.x - Recomendado
+const { PayPaySDK } = require('paypay-ao-sdk');
+
+// v2.x - TypeScript/ESM
+import { PayPaySDK } from 'paypay-ao-sdk';
+```
+
+##### API Mantida
+- Todos os métodos públicos da v1.x funcionam sem alteração
+- Mesmas assinaturas de função
+- Comportamento idêntico para casos existentes
+- Configuração compatível
+
+##### Melhorias Opcionais
+- Tipagem para melhor experiência de desenvolvimento
+- Classes de erro mais específicas
+- Validações com tipos de retorno tipados
+
+#### 🧪 Testes e Qualidade
+
+##### Configuração Jest
+- Suporte nativo ao TypeScript com `ts-jest`
+- Testes de tipos automáticos
+- Cobertura mantida em 90%+
+- Setup tipado para testes
+
+##### Validação de Build
+- Verificação automática de compatibilidade CJS/ESM
+- Testes de importação em ambos os formatos
+- Validação de definições de tipos
+- Scripts de verificação de migração
+
+#### 📚 Documentação
+
+##### Novos Arquivos
+- `README-v2.md` - Documentação completa da v2.0
+- `MIGRATION-GUIDE.md` - Guia detalhado de migração
+- Exemplos TypeScript em toda documentação
+
+##### Atualizações
+- README principal atualizado
+- Exemplos de uso com tipos
+- Documentação de todas as interfaces
+- Guias de troubleshooting
+
+#### 🚨 Breaking Changes (Mínimos)
+
+1. **Node.js**: Requer versão >= 16.0.0
+2. **Importação**: Forma recomendada mudou (mas compatível)
+3. **Erros**: Tipos mais específicos disponíveis (opt-in)
+4. **Build**: Estrutura de arquivos de saída reorganizada
+
+#### ⚠️ Deprecações
+
+- Importação direta (sem destructuring) desencorajada
+- Configurações antigas mantidas mas com warnings TypeScript
+- Alguns métodos internos marcados como deprecated
+
+---
+
+## [1.0.5] - 2024-12-15
+
+### 🐛 Correções
+- Corrigida validação de chaves PEM em alguns ambientes
+- Melhorada compatibilidade com Node.js 18+
+- Corrigidos timeouts em conexões lentas
+
+### 🔧 Melhorias
+- Logs mais detalhados para debugging
+- Validação aprimorada de números de telefone
+- Otimizações menores de performance
+
+---
+
 ## [1.0.0] - 2024-08-29
 
 ### 🎉 Lançamento Inicial
