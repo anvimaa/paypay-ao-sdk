@@ -117,7 +117,7 @@ router.post("/test-bank-account", async (req, res) => {
 
 // route for Payment to PAYPAY Account
 router.post("/test-paypay-account", async (req, res) => {
-    const { amount, payeeAccount } = req.body;
+    const { amount, payeeAccount, pay_product_code } = req.body;
     try {
         const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYACC");
         const ip = await PayPaySDK.getIp();
@@ -125,7 +125,7 @@ router.post("/test-paypay-account", async (req, res) => {
             outTradeNo: outTradeNo,
             amount: amount,
             payeeAccount: payeeAccount,
-            payerIp: ip,
+            payerIp: ip, pay_product_code
         });
         res.json(resp);
     } catch (err) {
