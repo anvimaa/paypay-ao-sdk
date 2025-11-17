@@ -94,6 +94,46 @@ router.post("/test-paypayapp", async (req, res) => {
     }
 })
 
+// route for Payment to Bank Account
+router.post("/test-bank-account", async (req, res) => {
+    const { amount, bankCode, bankAccountNo, accountName } = req.body;
+    try {
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("BANK");
+        const ip = await PayPaySDK.getIp();
+        const resp = await sdk.createBankAccountPayment({
+            outTradeNo: outTradeNo,
+            amount: amount,
+            bankCode: bankCode,
+            bankAccountNo: bankAccountNo,
+            accountName: accountName,
+            payerIp: ip,
+        });
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+})
+
+// route for Payment to PAYPAY Account
+router.post("/test-paypay-account", async (req, res) => {
+    const { amount, payeeAccount } = req.body;
+    try {
+        const outTradeNo = PayPaySDK.generateUniqueOrderNo("PAYACC");
+        const ip = await PayPaySDK.getIp();
+        const resp = await sdk.createPayPayAccountPayment({
+            outTradeNo: outTradeNo,
+            amount: amount,
+            payeeAccount: payeeAccount,
+            payerIp: ip,
+        });
+        res.json(resp);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+})
+
 router.post("/test-consult", async (req, res) => {
     const { outTradeNo } = req.body;
     try {
