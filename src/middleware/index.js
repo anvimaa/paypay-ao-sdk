@@ -49,7 +49,7 @@ function errorHandler(err, req, res, next) {
  * @param {Function} next - Next middleware function
  */
 async function requestLogger(req, res, next) {
-    const ip = await require('paypay-ao-sdk').getIp()
+    const ip = await require('paypay-ao-sdk').getIp() || "192.168.2.1"
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${ip}`);
     next();
